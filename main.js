@@ -6,19 +6,33 @@ const BrowserWindow =  electron.BrowserWindow;
 const path = require("path");
 const url = require("url");
 
-let win;
+let winOne,winTwo;
 
 function createWindow(){
-    win = new BrowserWindow();
-    win.loadURL(url.format({
-        pathname: path.join(__dirname,'index.html'),
+    winOne = new BrowserWindow();
+    winTwo = new BrowserWindow();
+
+    winOne.loadURL(url.format({
+        pathname: path.join(__dirname,'one.html'),
         protocol:'file',
         slashes: true
     }));
 
-    win.webContents.openDevTools();
-    win.on('closed',()=>{
-        win = null;
+    winTwo.loadURL(url.format({
+        pathname: path.join(__dirname,'two.html'),
+        protocol:'file',
+        slashes: true
+    }));
+
+    winOne.webContents.openDevTools();
+    winTwo.webContents.openDevTools();
+
+    winOne.on('closed',()=>{
+        winOne = null;
+    })
+
+    winTwo.on('closed',()=>{
+        winTwo = null;
     })
 }
 
