@@ -9,8 +9,16 @@ const url = require("url");
 let winOne,winTwo;
 
 function createWindow(){
-    winOne = new BrowserWindow();
-    winTwo = new BrowserWindow();
+    winOne = new BrowserWindow({
+        webPreferences:{
+            nodeIntegration:true
+        }
+    });
+    winTwo = new BrowserWindow({
+        webPreferences:{
+            nodeIntegration:true
+        }
+    });
 
     winOne.loadURL(url.format({
         pathname: path.join(__dirname,'one.html'),
