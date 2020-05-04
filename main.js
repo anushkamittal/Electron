@@ -17,7 +17,11 @@ function createWindow(){
     winTwo = new BrowserWindow({
         webPreferences:{
             nodeIntegration:true
-        }
+        },
+        height: 200,
+        width:500,
+        frame: false,
+        show:false
     });
 
     winOne.loadURL(url.format({
@@ -27,13 +31,13 @@ function createWindow(){
     }));
 
     winTwo.loadURL(url.format({
-        pathname: path.join(__dirname,'two.html'),
+        pathname: path.join(__dirname,'QuoteWidget.html'),
         protocol:'file',
         slashes: true
     }));
 
     winOne.webContents.openDevTools();
-    winTwo.webContents.openDevTools();
+    // winTwo.webContents.openDevTools();
 
     winOne.on('closed',()=>{
         winOne = null;
@@ -41,6 +45,10 @@ function createWindow(){
 
     winTwo.on('closed',()=>{
         winTwo = null;
+    })
+
+    winTwo.once('ready-to-show',()=>{
+        winTwo.show();
     })
 }
 
