@@ -5,8 +5,10 @@ const app = electron.app;
 const BrowserWindow =  electron.BrowserWindow;
 const path = require("path");
 const url = require("url");
+const ipc = electron.ipcMain
+const dialog = electron.dialog;
 
-let winOne,winTwo;
+let winOne,winTwo,winIpc;
 
 function createWindow(){
     winOne = new BrowserWindow({
@@ -24,6 +26,12 @@ function createWindow(){
         show:false
     });
 
+    winIpc = new BrowserWindow({
+        webPreferences:{
+            nodeIntegration:true
+        }
+    })
+
     winOne.loadURL(url.format({
         pathname: path.join(__dirname,'one.html'),
         protocol:'file',
@@ -36,8 +44,15 @@ function createWindow(){
         slashes: true
     }));
 
+    winIpc.loadURL(url.format({
+        pathname: path.join(__dirname,'ipc.html'),
+        protocol:'file',
+        slashes: true
+    }));
+
     winOne.webContents.openDevTools();
     // winTwo.webContents.openDevTools();
+    winIpc.webContents.openDevTools();
 
     winOne.on('closed',()=>{
         winOne = null;
@@ -47,8 +62,20 @@ function createWindow(){
         winTwo = null;
     })
 
+    winIpc.on('closed',()=>{
+        winIpc = null;
+    })
+
     winTwo.once('ready-to-show',()=>{
         winTwo.show();
+    })
+
+    ipc.on('async-message',function(event){
+        event.sender.send('async-reply','Main process opened the error dialog')
+    })
+
+    ipc.on('sync-message',function(event){
+        event.returnValue = 'sync-reply';
     })
 }
 
