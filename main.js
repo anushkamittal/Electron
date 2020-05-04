@@ -6,7 +6,8 @@ const BrowserWindow =  electron.BrowserWindow;
 const path = require("path");
 const url = require("url");
 const ipc = electron.ipcMain
-const Menu = electron.Menu
+const Menu = electron.Menu;
+const MenuItem = electron.MenuItem;
 
 let winOne,winQuote,winIpc;
 
@@ -121,6 +122,22 @@ app.on('ready',function(){
 
     const menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(menu);
+
+    const cxtMenu = new Menu();
+    cxtMenu.append(new MenuItem({
+        label:'Hello',
+        click:function(){
+            console.log('Context menu item clicked')
+        }
+    }))
+
+    cxtMenu.append(new MenuItem({
+        role:'selectAll'
+    }))
+
+    winOne.webContents.on('context-menu',function(e,params){
+        cxtMenu.popup(winOne,params.x,params.y);
+    })
 });
 
 app.on('window-all-closed',()=>{
