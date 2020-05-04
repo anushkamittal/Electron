@@ -6,9 +6,9 @@ const BrowserWindow =  electron.BrowserWindow;
 const path = require("path");
 const url = require("url");
 const ipc = electron.ipcMain
-const dialog = electron.dialog;
+const Menu = electron.Menu
 
-let winOne,winTwo,winIpc;
+let winOne,winQuote,winIpc;
 
 function createWindow(){
     winOne = new BrowserWindow({
@@ -16,7 +16,7 @@ function createWindow(){
             nodeIntegration:true
         }
     });
-    winTwo = new BrowserWindow({
+    winQuote = new BrowserWindow({
         webPreferences:{
             nodeIntegration:true
         },
@@ -38,7 +38,7 @@ function createWindow(){
         slashes: true
     }));
 
-    winTwo.loadURL(url.format({
+    winQuote.loadURL(url.format({
         pathname: path.join(__dirname,'QuoteWidget.html'),
         protocol:'file',
         slashes: true
@@ -51,23 +51,23 @@ function createWindow(){
     }));
 
     winOne.webContents.openDevTools();
-    // winTwo.webContents.openDevTools();
+    // winQuote.webContents.openDevTools();
     winIpc.webContents.openDevTools();
 
     winOne.on('closed',()=>{
         winOne = null;
     })
 
-    winTwo.on('closed',()=>{
-        winTwo = null;
+    winQuote.on('closed',()=>{
+        winQuote = null;
     })
 
     winIpc.on('closed',()=>{
         winIpc = null;
     })
 
-    winTwo.once('ready-to-show',()=>{
-        winTwo.show();
+    winQuote.once('ready-to-show',()=>{
+        winQuote.show();
     })
 
     ipc.on('async-message',function(event){
@@ -79,7 +79,49 @@ function createWindow(){
     })
 }
 
-app.on('ready',createWindow);
+app.on('ready',function(){
+    createWindow();
+    const template = [
+        {
+            label:'Edit',
+            submenu:[
+                { role: 'undo'},
+                { role: 'redo'},
+                { type: 'separator'},
+                { role: 'cut'},
+                { role: 'copy'},
+                { role: 'paste'},
+                { role: 'selectall'},
+            ]
+        },
+        {
+            label:'Demo',
+            submenu:[
+                {
+                    label:'submenu1',
+                    click:function(){
+                        console.log("Submenu 1");
+                    }
+                },
+                {
+                    type:'separator'
+                },
+                {
+                    label:'submenu2'
+                }
+            ]
+        },
+        {
+            label:'Help',
+            click:function(){
+                electron.shell.openExternal('http://electron.atom.io');
+            }
+        }
+    ]
+
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
+});
 
 app.on('window-all-closed',()=>{
     if(process.platform !== 'darwin'){
