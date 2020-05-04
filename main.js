@@ -8,6 +8,7 @@ const url = require("url");
 const ipc = electron.ipcMain
 const Menu = electron.Menu;
 const MenuItem = electron.MenuItem;
+const globalShortcut = electron.globalShortcut;
 
 let winOne,winQuote,winIpc;
 
@@ -114,9 +115,15 @@ app.on('ready',function(){
         },
         {
             label:'Help',
-            click:function(){
-                electron.shell.openExternal('http://electron.atom.io');
-            }
+            submenu:[
+                {
+                    label:'About electron',
+                    click:function(){
+                        electron.shell.openExternal('http://electron.atom.io');
+                    },
+                    accelerator: 'Ctrl+ Shift + @'
+                }
+            ]
         }
     ]
 
@@ -138,7 +145,15 @@ app.on('ready',function(){
     winOne.webContents.on('context-menu',function(e,params){
         cxtMenu.popup(winOne,params.x,params.y);
     })
+
+    globalShortcut.register('Alt+1',()=>{
+        winOne.show();
+    })
 });
+
+app.on('will-quit',()=>{
+    globalShortcut.unregisterAll();
+})
 
 app.on('window-all-closed',()=>{
     if(process.platform !== 'darwin'){
